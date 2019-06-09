@@ -1,0 +1,31 @@
+---
+- name: Include OS Vars
+  include_vars: "{{item}}"
+  with_first_found:
+  - "{{ansible_distribution}}.yml"
+
+- name: Install python docker-compose
+  pip:
+    name: docker-compose
+- name: Install Docker-compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.24.0/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: +x
+- name: Copy docker-compose.yml to /root/pebble
+  copy:
+    src: docker-compose.yml
+    dest: /root/pebble/
+- name: Copy pebble-conf.json
+  copy:
+    src: pebble-conf.json
+    dest: /etc/pebble-conf.json
+- name: Start pebble
+  docker_compose:
+    project_src: /root/pebble
+- name: Add pebble CA to trusted CA's
+  copy:
+    src: pebble.minica.pem
+    dest: "{{cert_path}}/pebble.minica.crt"
+- name: Update CA Certs
+  command: "{{update_certs_command}}"

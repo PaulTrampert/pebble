@@ -1,0 +1,2 @@
+cert_path: /etc/ca-certificates/trust-source/anchors
+update_certs_command: trust extract-compat
